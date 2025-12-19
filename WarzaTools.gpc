@@ -1,0 +1,142 @@
+#pragma METAINFO("WarzaVision Pro 9.6", 1, 0, "WarzaTools")
+
+#include <titanone.gph>
+
+// ============================================================================
+// GCV INPUT INDICES - MATCH PYTHON SCRIPT!
+// ============================================================================
+#define GCV_RHYTHM_SHOT     1
+#define GCV_REGULAR_SHOT    2
+#define GCV_RHYTHM_TIMING   3
+#define GCV_RHYTHM_TEMPO    4
+#define GCV_REGULAR_TIMING  5
+#define GCV_POST_SHOT       6
+#define GCV_POST_TIMING     7
+#define GCV_DUNK_READY      8
+#define GCV_DUNK_TIMING_LO  9
+#define GCV_DUNK_TIMING_HI  10
+#define GCV_PING_COMP       11
+#define GCV_METER_FILL      12
+#define GCV_IN_GREEN        13
+#define GCV_SHOT_QUALITY    14
+#define GCV_CONN_STATUS     15
+
+// Button mappings (universal for Xbox/PlayStation)
+#define BTN_SQUARE   17
+#define BTN_CROSS    18
+#define BTN_R2       5
+#define BTN_L2       8
+
+// State variables
+int rhythm_active;
+int regular_active;
+int post_active;
+int dunk_active;
+int rhythm_timing;
+int rhythm_tempo;
+int regular_timing;
+int post_timing;
+int dunk_timing;
+int ping_comp;
+int meter_fill;
+int in_green;
+
+main {
+    // Read all GCV values from Python
+    rhythm_active = gcv_read(GCV_RHYTHM_SHOT);
+    regular_active = gcv_read(GCV_REGULAR_SHOT);
+    rhythm_timing = gcv_read(GCV_RHYTHM_TIMING);
+    rhythm_tempo = gcv_read(GCV_RHYTHM_TEMPO);
+    regular_timing = gcv_read(GCV_REGULAR_TIMING);
+    post_active = gcv_read(GCV_POST_SHOT);
+    post_timing = gcv_read(GCV_POST_TIMING);
+    dunk_active = gcv_read(GCV_DUNK_READY);
+    dunk_timing = gcv_read(GCV_DUNK_TIMING_LO) | (gcv_read(GCV_DUNK_TIMING_HI) << 8);
+    ping_comp = gcv_read(GCV_PING_COMP);
+    meter_fill = gcv_read(GCV_METER_FILL);
+    in_green = gcv_read(GCV_IN_GREEN);
+    
+    // ========================================================================
+    // RHYTHM SHOT (Pro Stick) - Right stick shooting
+    // ========================================================================
+    if(rhythm_active == 0x01) {
+        combo_run(RhythmShot);
+    }
+    
+    // ========================================================================
+    // REGULAR SHOT - Square/X button shooting
+    // ========================================================================
+    if(regular_active == 0x01) {
+        combo_run(RegularShot);
+    }
+    
+    // ========================================================================
+    // POST SHOT - L2/LT + Square/X
+    // ========================================================================
+    if(post_active == 0x01) {
+        combo_run(PostShot);
+    }
+    
+    // ========================================================================
+    // AUTO DUNK - R3/RS + R2/RT while driving
+    // ========================================================================
+    if(dunk_active == 0x01) {
+        combo_run(AutoDunk);
+    }
+}
+
+// ============================================================================
+// RHYTHM SHOT COMBO - Pro stick timing
+// ============================================================================
+combo RhythmShot {
+    // Hold right stick down to initiate
+    set_val(10, 100);
+    wait(rhythm_timing);
+    
+    // Release at green window
+    set_val(10, 0);
+    wait(rhythm_tempo);
+}
+
+// ============================================================================
+// REGULAR SHOT COMBO - Button timing
+// ============================================================================
+combo RegularShot {
+    // Hold Square/X
+    set_val(BTN_SQUARE, 100);
+    wait(regular_timing);
+    
+    // Release at green
+    set_val(BTN_SQUARE, 0);
+    wait(50);
+}
+
+// ============================================================================
+// POST SHOT COMBO - L2 + Square timing
+// ============================================================================
+combo PostShot {
+    // Hold L2 + Square
+    set_val(BTN_L2, 100);
+    set_val(BTN_SQUARE, 100);
+    wait(post_timing);
+    
+    // Release
+    set_val(BTN_SQUARE, 0);
+    wait(30);
+    set_val(BTN_L2, 0);
+}
+
+// ============================================================================
+// AUTO DUNK COMBO - Timed dunk execution
+// ============================================================================
+combo AutoDunk {
+    // Hold R2 for sprint + Square for dunk
+    set_val(BTN_R2, 100);
+    set_val(BTN_SQUARE, 100);
+    wait(dunk_timing);
+    
+    // Release
+    set_val(BTN_SQUARE, 0);
+    wait(100);
+    set_val(BTN_R2, 0);
+}

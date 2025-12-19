@@ -1,0 +1,13 @@
+# WarzaVision Requirements
+# For NBA 2K26 Computer Vision Tool
+
+# Core Dependencies
+opencv-python>=4.8.0
+numpy>=1.24.0
+
+# GUI
+PyQt6>=6.5.0
+
+# Skeleton Tracking (Optional but Recommended)
+mediapipe>=0.10.9
+protobuf>=3.20.0

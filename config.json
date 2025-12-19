@@ -1,0 +1,16 @@
+{
+  "rhythm_timing_ms": 28,
+  "rhythm_tempo": 62,
+  "regular_timing_ms": 445,
+  "post_timing_ms": 64,
+  "dunk_timing_ms": 945,
+  "green_offset": 0,
+  "meter_color": "purple",
+  "color_space": "HSV",
+  "tolerance": 30,
+  "min_area": 500,
+  "max_area": 29900,
+  "auto_comp": true,
+  "show_overlay": true,
+  "aggressive_mode": true
+}
